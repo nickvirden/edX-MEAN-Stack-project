@@ -1,0 +1,84 @@
+
+# see gist here: https://gist.github.com/bennylope/5050811
+
+# Gleefully borrowed from playdoh
+ 
+require "yaml"
+ 
+# Load up our vagrant config files -- vagrantconfig.yaml first
+_config = YAML.load(File.open(File.join(File.dirname(__FILE__),
+                    "vagrantconfig.yaml"), File::RDONLY).read)
+ 
+# Local-specific/not-git-managed config -- vagrantconfig_local.yaml
+begin
+    _config.merge!(YAML.load(File.open(File.join(File.dirname(__FILE__),
+                   "vagrantconfig_local.yaml"), File::RDONLY).read))
+rescue Errno::ENOENT # No vagrantconfig_local.yaml found -- that's OK; just
+                     # use the defaults.
+end
+ 
+CONF = _config
+MOUNT_POINT = 'C:\Users\[name]\Desktop\[contianing_folder]\[folder]'
+
+
+
+Vagrant::Config.run do |config|
+  # The name after config.vm.define can be changed to name the VM anything
+  # you want upon intialization. Also, the prefix to the |..._config|
+  # should be changed on all portions below to reflect VM name change
+  config.vm.define :edXMEAN do |edXMEAN_config|
+    # Every Vagrant virtual environment requires a box to build off of.
+    edXMEAN_config.vm.box = "ubuntu/trusty64" #virtualbox
+
+    # The url from where the 'config.vm.box' box will be fetched if it
+    # doesn't already exist on the user's system.
+    edXMEAN_config.vm.box_url = "https://atlas.hashicorp.com/ubuntu/boxes/trusty64/versions/20150817.0.0/providers/virtualbox.box"
+
+    # Forward a port from the guest to the host, which allows for outside
+    # computers to access the VM, whereas host only networking does not.
+    edXMEAN_config.vm.forward_port 80, 8080
+    edXMEAN_config.vm.forward_port 8000, 8001
+    edXMEAN_config.vm.forward_port 5432, 5480, :auto => true # PostgreSQL
+
+    
+
+    # Increase vagrant's patience during hang-y CentOS bootup
+    # see: https://github.com/jedi4ever/veewee/issues/14
+    edXMEAN_config.ssh.max_tries = 50
+    edXMEAN_config.ssh.timeout   = 300
+
+    if CONF['nfs'] == false or RUBY_PLATFORM =~ /mswin(32|64)/
+        nfs = false
+    end
+ 
+    config.vm.share_folder("app_root", MOUNT_POINT, ".", :nfs => nfs)
+ 
+    if CONF.has_key?("mounts")
+        CONF['mounts'].each do |folder|
+            config.vm.share_folder(folder['name'], folder['virtual'], folder['host'], :nfs => true)
+        end
+    end
+ 
+    
+    # Add to /etc/hosts: 33.33.33.24 dev.playdoh.org
+    edXMEAN_config.vm.network :hostonly, "33.33.33.24"
+    
+
+    # Enable provisioning with chef solo, specifying a cookbooks path (relative
+    # to this Vagrantfile), and adding some recipes and/or roles.
+    #
+    #edXMEAN_config.vm.provision :chef_solo do |chef|
+    #  chef.cookbooks_path = "cookbooks"
+    #  chef.add_recipe "apt"
+    #  chef.add_recipe "apache2::mod_wsgi"
+    #  chef.add_recipe "build-essential"
+    #  chef.add_recipe "git"
+    #  chef.add_recipe "vim"
+    #
+    #   # You may also specify custom JSON attributes:
+    #   chef.json = { :mysql_password => "foo" }
+    #end
+  end
+
+
+end
