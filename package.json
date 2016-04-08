@@ -1,5 +1,6 @@
 {
     "dependencies": {
-        "underscore": "1.8.3"
+        "underscore": "1.8.3",
+        "mongodb": "2.1.16" // Put most recent version here
     }
 }
