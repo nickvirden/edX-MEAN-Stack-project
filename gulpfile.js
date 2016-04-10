@@ -12,6 +12,6 @@ gulp.task('test', function() {
 
 gulp.task('watch', function() {
     // First argument is file you want to watch
-    // Second argument is the task you want to run
+    // Second argument is the gulp.task you want to run
     gulp.watch('./*.js', ['test']);
 });

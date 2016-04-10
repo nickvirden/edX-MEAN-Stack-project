@@ -2,6 +2,7 @@
     "dependencies": {
         "underscore": "1.8.3",
         "mongodb": "2.1.16",
+        "mongoose": "4.4.12",
         "mocha": "2.4.5",
         "gulp": "3.9.1",
         "gulp-mocha": "2.2.0",

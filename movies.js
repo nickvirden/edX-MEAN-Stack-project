@@ -12,10 +12,10 @@ mongodb.MongoClient.connect(uri, function(error, db) {
         year: 1975,
         director: 'Steven Spielberg',
         rating: 'PG-13'
-        // rantings: {
-            // critics: 80,
-            // audience: 97
-        // };
+        /* rantings: {
+            critics: 80,
+            audience: 97
+        };*/
     };
 
     db.collection('movies').insert(doc, function(error, result) {
