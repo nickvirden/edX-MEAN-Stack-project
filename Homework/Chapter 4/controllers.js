@@ -127,10 +127,20 @@ exports.ProductDetailsController = function($scope, $routeParams, $http) {
 };
 
 exports.SearchBarController = function($scope, $http) {
+
   // TODO: this function should make an HTTP request to
   // `/api/v1/product/text/:searchText` and expose the response's
   // `products` property as `results` to the scope.
   $scope.update = function() {
+    var searchTextEncoded = encodeURIComponent($scope.searchText);
+
+    $http
+      .get('/api/v1/product/text/' + searchTextEncoded)
+      .success(function(data) {
+        $scope.results = data.products;
+        // Show results to ensure test executes properly
+        // console.log($scope.results);
+      });
   };
 
   setTimeout(function() {
